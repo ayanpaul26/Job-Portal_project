@@ -12,11 +12,10 @@ const locationRef = useRef(null)
 
 const onSearch = () =>{
 setSearchFilter({
-    title:titleRef.current.value,
-    location:locationRef.current.value,
+  title:titleRef.current.value,
+  location: locationRef.current.value
 })
 setIsSearched(true)
-
 }
 
   return (
