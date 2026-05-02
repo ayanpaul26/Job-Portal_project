@@ -1,18 +1,20 @@
-import Hero from "../components/Hero"
+import AppDownload from "../components/AppDownload";
+import Footer from "../components/Footer";
+import Hero from "../components/Hero";
 // import JobCard from "../components/JobCard"
-import Joblisting from "../components/Joblisting"
-import Navbar from "../components/Navbar"
-
+import Joblisting from "../components/Joblisting";
+import Navbar from "../components/Navbar";
 
 const Home = () => {
   return (
     <div>
-      <Navbar/>
-     <Hero/>
-     <Joblisting/>
-    {/* <JobCard/> */}
+      <Navbar />
+      <Hero />
+      <Joblisting />
+      <AppDownload />
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
