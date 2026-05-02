@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 // import JobCard from "../components/JobCard"
 import Joblisting from "../components/Joblisting";
 import Navbar from "../components/Navbar";
+import Applyjob from "./Applyjob";
 
 const Home = () => {
   return (
@@ -13,6 +14,7 @@ const Home = () => {
       <Joblisting />
       <AppDownload />
       <Footer />
+      <Applyjob/>
     </div>
   );
 };
