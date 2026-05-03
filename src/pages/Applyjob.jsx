@@ -101,7 +101,7 @@ const Applyjob = () => {
             </div>
           </div>
         </div>
-      </div>
+      <div/>
 
       <Footer />
     </>
