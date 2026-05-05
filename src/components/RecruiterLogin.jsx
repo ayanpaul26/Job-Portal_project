@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { assets } from "../assets/assets";
+import { AppContext } from "../context/AppContext";
 
 const RecruiterLogin = () => {
   const [state, setState] = useState("Login");
@@ -7,43 +8,89 @@ const RecruiterLogin = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState(false);
-  const [isTextDataSubmited, SetIsTextDataSubmited] = useState(false);
+  const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false);
+
+  const { setShowRecuiterLogin } = useContext(AppContext);
+    const {setShowRecruiterLogin} = useContext(AppContext)
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    if (state === "Sign Up" && !isTextDataSubmited) {
-      SetIsTextDataSubmited(true);
+
+    // Step 1 -> Step 2 for Sign Up
+    if (state === "Sign Up" && !isTextDataSubmitted) {
+      setIsTextDataSubmitted(true);
+      return;
     }
+
+    // Final submit logic
+    // console.log({
+    //   state,
+    //   name,
+    //   email,
+    //   password,
+    //   image,
+    // });
   };
 
+  useEffect(() =>{
+document.body.style.overflow = 'hidden'
+return() =>{
+  document.body.style.overflow = 'unset'
+}
+  },[])
+
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg-black/30 flex justify-center items-center">
-      <form  onSubmit={onSubmitHandler} className=" relative bg-white p-10 rounded-xl text-slate-500 shadow-xl w-full max-w-md">
-        <h1 className=" text-center text-2xl text-neutral-700 font font-medium">
-          Recruiter{state}
+    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <form
+        onSubmit={onSubmitHandler}
+        className="relative w-full max-w-md rounded-xl bg-white p-10 text-slate-500 shadow-xl"
+      >
+        {/* Close Button */}
+        <img
+          onClick={() => setShowRecuiterLogin(false)}
+          className="absolute top-5 right-5 cursor-pointer"
+          src={assets.cross_icon}
+          alt="close"
+        />
+
+        {/* Heading */}
+        <h1 className="text-center text-2xl font-medium text-neutral-700">
+          Recruiter {state}
         </h1>
-        <p className="text-small ml-12">
-          Welcome back! Please Sign in to continue
+
+        <p className="mt-2 text-center text-sm">
+          Welcome back! Please sign in to continue
         </p>
-        {state === "Sign Up" && isTextDataSubmited ? (
-          <> 
-          <div className="flex items-center  gap-4 my-10">
-            <label>
-              <img  className="w-16 rounded-full" src={ image ?URL.createObjectURL(image) : assets.upload_area}/>
-              {/* upto this done 3:47:10 */}
-              <input onChange={e => setImage(e.target.files[0])} type = "file" id="image" hidden/>
+
+        {/* Sign Up Step 2 - Upload Logo */}
+        {state === "Sign Up" && isTextDataSubmitted ? (
+          <div className="my-10 flex items-center gap-4">
+            <label htmlFor="image" className="cursor-pointer">
+              <img
+                className="w-16 rounded-full"
+                src={image ? URL.createObjectURL(image) : assets.upload_area}
+                alt="Company logo"
+              />
+              <input
+                onChange={(e) => setImage(e.target.files[0])}
+                type="file"
+                id="image"
+                hidden
+              />
             </label>
+
             <p>
-              Upload Company <br/> logo 
+              Upload Company <br /> Logo
             </p>
           </div>
-          </>
         ) : (
           <>
-            {state !== "Login" && (
-              <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-                <img src={assets.person_icon} />
+            {/* Company Name */}
+            {state === "Sign Up" && (
+              <div className="mt-5 flex items-center gap-2 rounded-full border px-4 py-2">
+                <img src={assets.person_icon} alt="person icon" />
                 <input
-                  className="outline-none text-sm"
+                  className="w-full text-sm outline-none"
                   onChange={(e) => setName(e.target.value)}
                   value={name}
                   type="text"
@@ -53,39 +100,57 @@ const RecruiterLogin = () => {
               </div>
             )}
 
-            <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-              <img src={assets.email_icon} />
+            {/* Email */}
+            <div className="mt-5 flex items-center gap-2 rounded-full border px-4 py-2">
+              <img src={assets.email_icon} alt="email icon" />
               <input
-                className="outline-none text-sm"
+                className="w-full text-sm outline-none"
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
                 type="email"
-                placeholder="email "
+                placeholder="Email"
                 required
               />
             </div>
-            <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-              <img src={assets.lock_icon} />
+
+            {/* Password */}
+            <div className="mt-5 flex items-center gap-2 rounded-full border px-4 py-2">
+              <img src={assets.lock_icon} alt="lock icon" />
               <input
-                className="outline-none text-sm"
+                className="w-full text-sm outline-none"
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
                 type="password"
-                placeholder="password"
+                placeholder="Password"
                 required
               />
             </div>
           </>
         )}
-        <p className="text-blue-600 my-4 cursor-pointer">Forgot password</p>
-        <button type="submit" className="w-full bg-blue-600 text-white py-1 rounded-full hover:bg-blue-700 transition mt-5">
-          {state === "Login" ? "login" : isTextDataSubmited ?  "creat account" : "next"}
+
+        {/* Forgot Password */}
+        {state === "Login" && (
+          <p className="mt-4 cursor-pointer text-blue-600">Forgot password?</p>
+        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="mt-5 w-full rounded-full bg-blue-600 py-2 text-white transition hover:bg-blue-700"
+        >
+          {state === "Login"
+            ? "Login"
+            : isTextDataSubmitted
+            ? "Create Account"
+            : "Next"}
         </button>
+
+        {/* Toggle Auth Mode */}
         {state === "Login" ? (
           <p className="mt-5 text-center">
-            Don't have an account
+            Don&apos;t have an account?{" "}
             <span
-              className="text-blue-600 cursor-pointer"
+              className="cursor-pointer text-blue-600"
               onClick={() => setState("Sign Up")}
             >
               Sign Up
@@ -95,13 +160,17 @@ const RecruiterLogin = () => {
           <p className="mt-5 text-center">
             Already have an account?{" "}
             <span
-              className="text-blue-600 cursor-pointer"
-              onClick={() => setState("Login")}
+              className="cursor-pointer text-blue-600"
+              onClick={() => {
+                setState("Login");
+                setIsTextDataSubmitted(false);
+              }}
             >
               Login
             </span>
           </p>
         )}
+        <img  onClick={()=> setShowRecruiterLogin(false)} className="absolute top-5 right-5 cursor-pointer" src={assets.cross_icon} />
       </form>
     </div>
   );

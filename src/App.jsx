@@ -5,6 +5,10 @@ import Application from "./pages/Applications"
 import RecruiterLogin from "./components/RecruiterLogin"
 import { useContext } from "react"
 import { AppContext } from "./context/AppContext"
+import Dashboard from "./pages/Dashboard"
+import AddJob from "./pages/AddJob"
+import ManageJobs from "./pages/ManageJobs"
+import ViewApplications from "./pages/ViewApplications"
 
 const App = () => {
 
@@ -18,6 +22,11 @@ const App = () => {
         <Route path="/" element ={<Home/>} />
          <Route path="/apply-jobs/:id" element ={<Applyjob/>} />
           <Route path="/applications" element ={< Application />} />
+          <Route path="/dashboard" element = {<Dashboard/>}>
+            <Route  path="add-job" element = {AddJob}/>
+             <Route  path="manage-job" element = {ManageJobs}/> 
+             <Route  path="view-applications" element = {ViewApplications}/>
+          </Route>
       </Routes>
       
     </div>

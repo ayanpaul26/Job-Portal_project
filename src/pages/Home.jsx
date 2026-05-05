@@ -15,7 +15,7 @@ const Home = () => {
       <Joblisting />
       <AppDownload />
       <Footer />
-      <Applyjob/>
+    
       {/* <JobCard/> */}
     </div>
   );
