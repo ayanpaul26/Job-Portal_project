@@ -1,13 +1,19 @@
 // import { Outlet } from "react-router-dom";
 import { assets } from "../assets/assets";
-
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen">
       {/* navbar for req panale */}
       <div className="shadow py-4">
         <div className="px-5 flex justify-between items-center">
-          <img className="max-sm:w-32 cursor-pointer " src={assets.logo} />
+          <img
+            onClick={(e) => navigate("/")}
+            className="max-sm:w-32 cursor-pointer "
+            src={assets.logo}
+          />
           <div className="flex items-center gap-3">
             <p className="max-sm:hidden">Welcome , GreatStack</p>
             <div className="relative group">
@@ -20,6 +26,7 @@ const Dashboard = () => {
                   <li className="px-4 py-2 cursor-pointer rounded-lg text-gray-700 hover:bg-gray-100 hover:text-black transition-all duration-200">
                     Logout
                   </li>
+
                   {/* till done 4:01:23
                   
                   uptill the logo click and go to home */}
@@ -27,6 +34,30 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="flelx items-start">
+        {/* left sidebar with option to add jobs manage job and view application */}
+        <div className="inline-block min-h-screen border-r-1">
+          <ul className="flex flex-col items-start pt-5 text-gray-800">
+            <NavLink className={({isActive}) => ` flex items-center  p-3 sm:px-6 gap-2 w-full hover:bg-gray-200 ${isActive && 'bg-blue-100 border-r-4 border-blue-500'}`} to={"/dashboard/add-job"}>
+              <img className="min-w-4" src={assets.add_icon} />
+              <p className="max-sm:hidden">Add Job</p>
+            </NavLink>
+            <NavLink className={({isActive}) => ` flex items-center  p-3 sm:px-6 gap-2 w-full hover:bg-gray-200 ${isActive && 'bg-blue-100 border-r-4 border-blue-500'}`} to={"/dashboard/manage-jobs"}>
+              <img className="min-w-4" src={assets.home_icon} />
+              <p className="max-sm:hidden">Manage Jobs</p>
+            </NavLink>
+            <NavLink className={({isActive}) => ` flex items-center  p-3 sm:px-6 gap-2 w-full hover:bg-gray-200 ${isActive && 'bg-blue-100 border-r-4 border-blue-500'}`} to={"/dashboard/view-applications"}>
+              <img className="min-w-4" src={assets.person_tick_icon} />
+              <p className="max-sm:hidden">View Applications</p>
+              {/* uptill   addjobs page will cont from it time ==> 4:9:46*/}
+            </NavLink>
+          </ul>
+        </div>
+        <div>
+          <Outlet />
         </div>
       </div>
     </div>
