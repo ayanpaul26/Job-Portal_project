@@ -21,7 +21,7 @@ app.get("/", (req, res) => res.send("API working"));
 app.get("/debug-sentry", function mainHandler(req, res) {
   throw new Error("My first Sentry error!");
 });
-{/* <div></div> */}
+// {/* <div></div> */}
 // port
 const PORT = process.env.PORT || 5000;
 
