@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { JobCategories, JobLocations } from "../assets/assets";
+import axios from "axios";
+import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 const AddJob = () => {
   const [title, setTitle] = useState("");
@@ -12,6 +15,30 @@ const AddJob = () => {
 
   const editorRef = useRef(null);
   const quillRef = useRef(null);
+  const { backendUrl, companyToken } = useContext(AppContext);
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const description = quillRef.current.root.innerHTML;
+
+      const { data } = await axios.post(
+        backendUrl + "/api/company/post-job",
+        { title, description, location, salary, category, level },
+        { headers: { token: companyToken } },
+      );
+      if (data.success) {
+        toast.success(data.message);
+        setTitle("");
+        setSalary(0);
+        quillRef.current.root.innerHTML = "";
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
@@ -22,11 +49,12 @@ const AddJob = () => {
   }, []);
 
   return (
-    <form className="w-full max-w-4xl p-8 bg-white rounded-xl shadow-md flex flex-col gap-6">
+    <form
+      onSubmit={onSubmitHandler}
+      className="w-full max-w-4xl p-8 bg-white rounded-xl shadow-md flex flex-col gap-6"
+    >
       <div className="w-full">
-        <p className="mb-2 text-lg font-semibold text-gray-800">
-          Job Title
-        </p>
+        <p className="mb-2 text-lg font-semibold text-gray-800">Job Title</p>
 
         <input
           type="text"
@@ -52,9 +80,7 @@ const AddJob = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full mt-12">
         <div>
-          <p className="mb-2 text-gray-800 font-medium">
-            Job Category
-          </p>
+          <p className="mb-2 text-gray-800 font-medium">Job Category</p>
 
           <select
             onChange={(e) => setCategory(e.target.value)}
@@ -70,9 +96,7 @@ const AddJob = () => {
         </div>
 
         <div>
-          <p className="mb-2 text-gray-800 font-medium">
-            Job Location
-          </p>
+          <p className="mb-2 text-gray-800 font-medium">Job Location</p>
 
           <select
             onChange={(e) => setLocation(e.target.value)}
@@ -88,21 +112,15 @@ const AddJob = () => {
         </div>
 
         <div>
-          <p className="mb-2 text-gray-800 font-medium">
-            Job Level
-          </p>
+          <p className="mb-2 text-gray-800 font-medium">Job Level</p>
 
           <select
             onChange={(e) => setLevel(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none focus:border-blue-500"
           >
-            <option value="Beginner level">
-              Beginner level
-            </option>
+            <option value="Beginner level">Beginner level</option>
 
-            <option value="Intermediate level">
-              Intermediate level
-            </option>
+            <option value="Intermediate level">Intermediate level</option>
 
             <option value="Senior level">Senior level</option>
           </select>
@@ -110,9 +128,7 @@ const AddJob = () => {
       </div>
 
       <div className="w-full">
-        <p className="mb-2 text-gray-800 font-medium">
-          Job Salary
-        </p>
+        <p className="mb-2 text-gray-800 font-medium">Job Salary</p>
 
         <input
           onChange={(e) => setSalary(e.target.value)}

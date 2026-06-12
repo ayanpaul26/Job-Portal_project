@@ -3,10 +3,15 @@ import { assets } from "../assets/assets";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
-
+//  import { useAuth } from "@clerk/clerk-react";
 const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
+ 
+
+// const { userId } = useAuth();
+
+// console.log("User ID:", userId);
   const navigate = useNavigate();
 
   const { showRecruiterLogin, setShowRecruiterLogin } = useContext(AppContext);

@@ -1,12 +1,48 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { assets, jobsApplied } from "../assets/assets";
 import moment from "moment";
+import { AppContext } from "../context/AppContext";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Applications = () => {
+  const { user } = useUser();
+
+  console.log("Clerk User ID:", user?.id);
+
+  const { getToken } = useAuth();
   const [isEdit, setIsEdit] = useState(false);
   const [resume, setResume] = useState(null);
+  const { backendUrl, userData, userApplications, fetchUserData } =
+    useContext(AppContext);
+  const updateResume = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("resume", resume);
+      const token = await getToken();
+
+      const { data } = await axios.post(
+        backendUrl + "/api/users/update-resume",
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        await fetchUserData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+
+    setIsEdit(false);
+    setResume(null);
+  };
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -28,14 +64,14 @@ const Applications = () => {
         <h2 className="text-xl font-semibold mb-4">Your Resume</h2>
 
         <div className="flex flex-wrap items-center gap-3 mb-8">
-          {isEdit ? (
+          {isEdit || (userData && userData.resume === "") ? (
             <>
               <label
                 htmlFor="resumeUpload"
                 className="flex items-center cursor-pointer"
               >
                 <p className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg mr-2">
-                  Select Resume
+                  {resume ? resume.name : " Select Resume"}
                 </p>
 
                 <input
@@ -54,7 +90,7 @@ const Applications = () => {
               </label>
 
               <button
-                onClick={() => setIsEdit(false)}
+                onClick={updateResume}
                 className="bg-green-100 text-green-700 px-4 py-2 rounded-lg border border-green-400"
               >
                 Save
@@ -97,29 +133,31 @@ const Applications = () => {
             </thead>
 
             <tbody>
-              {jobsApplied.length > 0 ? (
-                jobsApplied.map((job, index) => (
+              {userApplications?.length > 0 ? (
+                userApplications.map((job, index) => (
                   <tr key={index} className="border-t border-gray-200">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <img
-                          src={job.logo}
-                          alt={job.company}
+                          src={job.companyId.image}
+                          alt={job.companyId.name}
                           className="w-8 h-8 object-contain"
                         />
-                        <span>{job.company}</span>
+                        <span>{job.companyId.name}</span>
                       </div>
                     </td>
 
-                    <td className="px-4 py-3">{job.title}</td>
-                    <td className="px-4 py-3">{job.location}</td>
+                    <td className="px-4 py-3">{job.jobId.title}</td>
+                    <td className="px-4 py-3">{job.jobId.location}</td>
+
                     <td className="px-4 py-3">
                       {moment(job.date).format("ll")}
                     </td>
+
                     <td className="px-4 py-3">
                       <span
                         className={`px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusClass(
-                          job.status
+                          job.status,
                         )}`}
                       >
                         {job.status}
@@ -129,10 +167,7 @@ const Applications = () => {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="5"
-                    className="text-center py-6 text-gray-500"
-                  >
+                  <td colSpan="5" className="text-center py-6 text-gray-500">
                     No jobs applied yet.
                   </td>
                 </tr>
@@ -148,3 +183,5 @@ const Applications = () => {
 };
 
 export default Applications;
+
+// userApplications.length > 0 ? (

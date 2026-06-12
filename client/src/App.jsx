@@ -10,14 +10,17 @@ import AddJob from "./pages/AddJob";
 import ManageJobs from "./pages/ManageJobs";
 import ViewApplications from "./pages/ViewApplications";
 import "quill/dist/quill.snow.css";
+import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToaastify.css";
 
 const App = () => {
-  const { showRecruiterLogin } = useContext(AppContext);
+  const { showRecruiterLogin , companyToken } = useContext(AppContext);
 
   return (
     <div>
       {showRecruiterLogin && <RecruiterLogin />}
-
+      <ToastContainer />
+      {/* <toast/> */}
       <Routes>
         <Route path="/" element={<Home />} />
 
@@ -26,14 +29,17 @@ const App = () => {
         <Route path="/applications" element={<Application />} />
 
         <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="add-job" element={<AddJob />} />
+        {/* <Route path="/recruiter/dashboard" element={<Dashboard />}> */}
 
+        {companyToken ? <>
+         <Route path="add-job" element={<AddJob />} />
           <Route path="manage-job" element={<ManageJobs />} />
+          <Route path="view-applications" element={<ViewApplications />} />
 
-          <Route
-            path="view-applications"
-            element={<ViewApplications />}
-          />
+          </>:null
+          }
+
+         
         </Route>
       </Routes>
     </div>

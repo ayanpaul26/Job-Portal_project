@@ -6,6 +6,6 @@ const companySchema = new mongoose.Schema({
   password: { type: String, required: true },
 });
 
-const company =  mongoose.model('company',companySchema);
+const Company = mongoose.model('Company', companySchema);
 
-export default company
+export default Company;

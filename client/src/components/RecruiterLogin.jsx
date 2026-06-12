@@ -1,8 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
+import axios from "axios";
+// import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const RecruiterLogin = () => {
+  const navigate = useNavigate();
   const [state, setState] = useState("Login");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -10,34 +15,69 @@ const RecruiterLogin = () => {
   const [image, setImage] = useState(false);
   const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false);
 
-  const { setShowRecuiterLogin } = useContext(AppContext);
-    const {setShowRecruiterLogin} = useContext(AppContext)
+  // const { setShowRecuiterLogin } = useContext(AppContext);
+  const { setShowRecruiterLogin, backendUrl, setCompanyToken, setCompanyData } =
+    useContext(AppContext);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     // Step 1 -> Step 2 for Sign Up
     if (state === "Sign Up" && !isTextDataSubmitted) {
-      setIsTextDataSubmitted(true);
-      return;
+      
+      return setIsTextDataSubmitted(true);
     }
 
-    // Final submit logic
-    // console.log({
-    //   state,
-    //   name,
-    //   email,
-    //   password,
-    //   image,
-    // });
+    try {
+      if (state === "Login") {
+        const { data } = await axios.post(backendUrl + "/api/company/login", {
+          email,
+          password,
+        });
+        if (data.success) {
+          // console.log(data);
+          // console.log("Login Success");
+          setCompanyData(data.company);
+          setCompanyToken(data.token);
+          localStorage.setItem("companyToken", data.token);
+          setShowRecruiterLogin(false);
+          navigate('/dashboard');
+        } else {
+          toast.error(data.message);
+        }
+      } else {
+      const formData = new FormData()
+
+        formData.append('name',name)
+        formData.append('password',password)
+        formData.append('email',email)
+        formData.append('image',image)
+        
+         const { data } = await axios.post(backendUrl + "/api/company/register",formData) 
+         if (data.success) {
+          //  console.log(data);
+          // console.log("Login Success");
+          setCompanyData(data.company);
+          setCompanyToken(data.token);
+          localStorage.setItem("companyToken", data.token);
+          setShowRecruiterLogin(false);
+          navigate('/dashboard');
+         }
+         else{
+           toast.error(data.message);
+        }
+      }
+    } catch (error) {
+       toast.error(error.message);
+    }
   };
 
-  useEffect(() =>{
-document.body.style.overflow = 'hidden'
-return() =>{
-  document.body.style.overflow = 'unset'
-}
-  },[])
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   return (
     <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 backdrop-blur-sm">
@@ -47,7 +87,7 @@ return() =>{
       >
         {/* Close Button */}
         <img
-          onClick={() => setShowRecuiterLogin(false)}
+          onClick={() => setShowRecruiterLogin(false)}
           className="absolute top-5 right-5 cursor-pointer"
           src={assets.cross_icon}
           alt="close"
@@ -141,8 +181,8 @@ return() =>{
           {state === "Login"
             ? "Login"
             : isTextDataSubmitted
-            ? "Create Account"
-            : "Next"}
+              ? "Create Account"
+              : "Next"}
         </button>
 
         {/* Toggle Auth Mode */}
@@ -170,7 +210,11 @@ return() =>{
             </span>
           </p>
         )}
-        <img  onClick={()=> setShowRecruiterLogin(false)} className="absolute top-5 right-5 cursor-pointer" src={assets.cross_icon} />
+        <img
+          onClick={() => setShowRecruiterLogin(false)}
+          className="absolute top-5 right-5 cursor-pointer"
+          src={assets.cross_icon}
+        />
       </form>
     </div>
   );

@@ -1,8 +1,29 @@
+import { useContext, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { companyData, setCompanyData, setCompanyToken } =
+    useContext(AppContext);
+
+  // funtion to logout company
+
+  const logout = () => {
+    setCompanyToken(null);
+    localStorage.removeItem("companyToken");
+    setCompanyData(null);
+    navigate("/");
+  };
+
+  //make default landing page
+
+  useEffect(() => {
+    if (companyData) {
+      navigate('/dashboard/manage-job');
+    }
+  }, [companyData]);
 
   return (
     <div className="min-h-screen">
@@ -14,25 +35,29 @@ const Dashboard = () => {
             className="max-sm:w-32 cursor-pointer"
             src={assets.logo}
           />
+          {companyData && (
+            <div className="flex items-center gap-3">
+              <p className="max-sm:hidden">Welcome , {companyData.name}</p>
 
-          <div className="flex items-center gap-3">
-            <p className="max-sm:hidden">Welcome , GreatStack</p>
+              <div className="relative group">
+                <img
+                  className="w-8 border rounded-full"
+                  src={companyData.image}
+                />
 
-            <div className="relative group">
-              <img
-                className="w-8 border rounded-full"
-                src={assets.company_icon}
-              />
-
-              <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
-                <ul className="list-none m-0 p-1 bg-white rounded-xl border border-gray-200 shadow-lg text-sm min-w-[140px]">
-                  <li className="px-4 py-2 cursor-pointer rounded-lg text-gray-700 hover:bg-gray-100 hover:text-black transition-all duration-200">
-                    Logout
-                  </li>
-                </ul>
+                <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
+                  <ul className="list-none m-0 p-1 bg-white rounded-xl border border-gray-200 shadow-lg text-sm min-w-[140px]">
+                    <li
+                      onClick={logout}
+                      className="px-4 py-2 cursor-pointer rounded-lg text-gray-700 hover:bg-gray-100 hover:text-black transition-all duration-200"
+                    >
+                      Logout
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -43,8 +68,7 @@ const Dashboard = () => {
             <NavLink
               className={({ isActive }) =>
                 `flex items-center p-3 sm:px-6 gap-2 w-full hover:bg-gray-200 ${
-                  isActive &&
-                  "bg-blue-100 border-r-4 border-blue-500"
+                  isActive && "bg-blue-100 border-r-4 border-blue-500"
                 }`
               }
               to={"/dashboard/add-job"}
@@ -56,8 +80,7 @@ const Dashboard = () => {
             <NavLink
               className={({ isActive }) =>
                 `flex items-center p-3 sm:px-6 gap-2 w-full hover:bg-gray-200 ${
-                  isActive &&
-                  "bg-blue-100 border-r-4 border-blue-500"
+                  isActive && "bg-blue-100 border-r-4 border-blue-500"
                 }`
               }
               to={"/dashboard/manage-job"}
@@ -69,25 +92,19 @@ const Dashboard = () => {
             <NavLink
               className={({ isActive }) =>
                 `flex items-center p-3 sm:px-6 gap-2 w-full hover:bg-gray-200 ${
-                  isActive &&
-                  "bg-blue-100 border-r-4 border-blue-500"
+                  isActive && "bg-blue-100 border-r-4 border-blue-500"
                 }`
               }
               to={"/dashboard/view-applications"}
             >
-              <img
-                className="min-w-4"
-                src={assets.person_tick_icon}
-              />
+              <img className="min-w-4" src={assets.person_tick_icon} />
 
-              <p className="max-sm:hidden">
-                View Applications
-              </p>
+              <p className="max-sm:hidden">View Applications</p>
             </NavLink>
           </ul>
         </div>
 
-        <div>
+        <div className="flex-1 h-full p-2 sm:p-5">
           <Outlet />
         </div>
       </div>
