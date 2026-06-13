@@ -22,6 +22,10 @@ await connectCloudinary()
 
 // middlewares
 app.use(cors());
+
+// Clerk webhooks must receive the raw body so Svix can verify the signature.
+app.post('/webhooks', express.raw({ type: 'application/json' }), clerkWebhooks)
+
 app.use(express.json());
 app.use(clerkMiddleware())
 
@@ -33,7 +37,6 @@ app.get("/debug-sentry", function mainHandler(req, res) {
 });
 
 
-app.post('/webhooks',clerkWebhooks)
 app.use('/api/company',companyRoutes)
 app.use('/api/jobs',jobRoutes)
 app.use('/api/users',userRoutes)

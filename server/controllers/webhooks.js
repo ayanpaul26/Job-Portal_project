@@ -6,32 +6,52 @@ export const clerkWebhooks = async (req, res) => {
   try {
     console.log("Webhook received");
 
-    // Get data from request body
-    const { data, type } = req.body;
-
-    console.log("Type:", type);
-
     // Create Svix instance
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
+    const payload = Buffer.isBuffer(req.body)
+      ? req.body.toString("utf8")
+      : JSON.stringify(req.body);
+
     // Verify webhook signature
-    await whook.verify(JSON.stringify(req.body), {
+    const event = whook.verify(payload, {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"],
     });
 
+    const { data, type } = event;
+
+    console.log("Type:", type);
+
+    const primaryEmail =
+      data.email_addresses?.find(
+        (email) => email.id === data.primary_email_address_id
+      )?.email_address || data.email_addresses?.[0]?.email_address;
+
+    const displayName =
+      `${data.first_name || ""} ${data.last_name || ""}`.trim() ||
+      data.username ||
+      primaryEmail?.split("@")[0] ||
+      "User";
+
     switch (type) {
       case "user.created": {
         const userData = {
-          _id: data.id,
-          name: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
-          email: data.email_addresses?.[0]?.email_address,
-          image: data.image_url,
-          resume: "",
+          name: displayName,
+          email: primaryEmail,
+          image: data.image_url || "",
         };
 
-        await User.create(userData);
+        await User.findByIdAndUpdate(data.id, {
+          $set: userData,
+          $setOnInsert: { resume: "" },
+        }, {
+          upsert: true,
+          new: true,
+          runValidators: true,
+          setDefaultsOnInsert: true,
+        });
 
         console.log("User created:", data.id);
 
@@ -42,12 +62,17 @@ export const clerkWebhooks = async (req, res) => {
 
       case "user.updated": {
         const userData = {
-          name: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
-          email: data.email_addresses?.[0]?.email_address,
-          image: data.image_url,
+          name: displayName,
+          email: primaryEmail,
+          image: data.image_url || "",
         };
 
-        await User.findByIdAndUpdate(data.id, userData);
+        await User.findByIdAndUpdate(data.id, userData, {
+          upsert: true,
+          new: true,
+          runValidators: true,
+          setDefaultsOnInsert: true,
+        });
 
         console.log("User updated:", data.id);
 
